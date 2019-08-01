@@ -4,8 +4,8 @@ from item import views
 
 
 router = DefaultRouter()
-router.register('', views.ItemViewSet)
+router.register('', views.CategoryViewSet)
 
 urlpatterns = [
-    path('', include(router.urls))
+    path('', include(router.urls)),
 ]
