@@ -1,6 +1,6 @@
 # django rest_framework 설정 (window)
 
-- *cmd*
+- **cmd**
 
 ```
 cd C:\Users\user\Desktop\workspace
@@ -12,20 +12,20 @@ python -m venv --copies venv
 
 
 
-- *settings*
+- **settings**
 
-File->Settings->Build, Execution, Deployment->Console->Python ConsoleEnvironment variables: **DJANGO_SETTINGS_MODULE=django_rest.settings**
+> File->Settings->Build, Execution, Deployment->Console->Python ConsoleEnvironment variables: **DJANGO_SETTINGS_MODULE=django_rest.settings**
 
-*Starting script에 아래 두 라인 추가*
+> *Starting script에 아래 두 라인 추가*
+>
+> ```
+> import django
+> django.setup()
+> ```
 
-```
-import django
-django.setup()
-```
 
 
-
-- *터미널*
+- **터미널**
 
 ```
 python -m django --vesion
@@ -40,9 +40,9 @@ python manage.py runserver
 
 - *Run/Debug Configurations*
 
-Script path: (manage.py 찾아서 지정)
-
-Parameters: runserver 8001
+> Script path: (manage.py 찾아서 지정)
+>
+> Parameters: runserver 8001
 
 
 
@@ -52,14 +52,14 @@ Parameters: runserver 8001
 python manage.py startapp snippets
 ```
 
-django_rest>settings.py
-
-installes_app=[]에
-
-```
-'rest_framework',
-'snippets.apps.SnippetsConfig',
-```
+> django_rest>settings.py
+>
+> installes_app=[]에
+>
+> ```python
+> 'rest_framework',
+> 'snippets.apps.SnippetsConfig',
+> ```
 
 추가하기
 
@@ -71,7 +71,7 @@ installes_app=[]에
 
 ---
 
-새로 내려받아서 작업한다면
+# 새로 내려받아서 작업한다면
 
 clone 내려받고
 
@@ -103,3 +103,82 @@ python -m venv --copies venv
 > ```
 > pip freeze > requirements.txt
 > ```
+
+
+
+***
+
+# models, serializers, views, urls 작성요령
+
+**model.py**
+
+```python
+from django.db import models
+
+class Item(models.Model):
+    title = models.CharField(max_length=100)
+    description = models.TextField()
+    created = models.DateTimeField(auto_now_add=True)
+    price = models.IntegerField(default=0)
+    image = models.ImageField(upload_to='uploads/item_images/')
+```
+
+> 데이터베이스에 어떤 속성들이 들어갈지 정의
+
+**serializers.py**
+
+```python
+from rest_framework import serializers
+from .models import Item
+
+
+class ItemSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Item
+        fields = ['id', 'title', 'description', 'created', 'price', 'image']
+```
+
+> 어떤 값을 보여줄지 정의
+
+**views.py**
+
+```python
+from rest_framework import viewsets
+
+from .models import Item
+from .serializers import ItemSerializer
+
+
+class ItemViewSet(viewsets.ModelViewSet):
+    queryset = Item.objects.all()
+    serializer_class = ItemSerializer
+```
+
+> 
+
+**urls.py**
+
+```python
+from rest_framework.routers import DefaultRouter
+from django.urls import path, include
+
+from item import views
+
+
+router = DefaultRouter()
+router.register('', views.ItemViewSet)
+
+urlpatterns = [
+    path('', include(router.urls))
+]
+```
+
+**root>urls.py**
+
+```python
+from django.urls import path, include
+
+urlpatterns = [
+    path('items/', include(item.urls')),
+]
+```
