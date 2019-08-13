@@ -4,12 +4,17 @@ from rest_framework.response import Response
 from .models import Item, UserItem, Category
 from .serializers import ItemSerializer, UserItemSerializer, CategorySerializer
 from django.db import transaction
+from rest_condition import Or, And
+from item.permissions import IsPurchase, IsSafeMethod
 
 
 class ItemViewSet(viewsets.ModelViewSet):
     queryset = Item.objects.all()
     serializer_class = ItemSerializer
-    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+    permission_classes = (Or(IsSafeMethod,
+                             permissions.IsAdminUser,
+                             And(IsPurchase, permissions.IsAuthenticated)
+                             ),)
 
     @action(detail=True, methods=['POST'])
     def purchase(self, request, *args, **kwargs):
@@ -62,5 +67,5 @@ class CategoryViewSet(viewsets.ReadOnlyModelViewSet):
     @action(detail=True)
     def items(self, request, *args, **kwargs):
         category = self.get_object()
-        serializer = ItemSerializer(category.items.all(), many=True)
+        serializer = ItemSerializer(category.items.all(), many=True, context=self.get_serializer_context())
         return Response(serializer.data)

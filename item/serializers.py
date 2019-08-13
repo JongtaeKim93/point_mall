@@ -23,7 +23,3 @@ class UserItemSerializer(serializers.ModelSerializer):
     class Meta:
         model = UserItem
         fields = ['item', 'user', 'count']
-
-
-
-

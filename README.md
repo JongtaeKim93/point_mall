@@ -1,6 +1,6 @@
 # django rest_framework 설정 (window)
 
-- **cmd**
+**cmd**
 
 ```
 cd C:\Users\user\Desktop\workspace
@@ -12,7 +12,7 @@ python -m venv --copies venv
 
 
 
-- **settings**
+**settings**
 
 > File->Settings->Build, Execution, Deployment->Console->Python ConsoleEnvironment variables: **DJANGO_SETTINGS_MODULE=django_rest.settings**
 
@@ -25,7 +25,7 @@ python -m venv --copies venv
 
 
 
-- **터미널**
+**터미널**
 
 ```
 python -m django --vesion
@@ -38,7 +38,7 @@ python manage.py runserver
 
 
 
-- *Run/Debug Configurations*
+**Run/Debug Configurations**
 
 > Script path: (manage.py 찾아서 지정)
 >
@@ -46,7 +46,7 @@ python manage.py runserver
 
 
 
-- *app 만들기*
+**app 만들기**
 
 ```
 python manage.py startapp snippets
@@ -66,6 +66,14 @@ python manage.py startapp snippets
 
 
 이후 models.py, serializer.py, views.py, urls.py 작업
+
+
+
+**admin 계정 만들기**
+
+```
+python manage.py createsuperuser
+```
 
 
 
