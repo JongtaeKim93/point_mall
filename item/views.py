@@ -82,5 +82,37 @@ class CategoryViewSet(viewsets.ReadOnlyModelViewSet):
 
 
 class HistoryViewSet(viewsets.ReadOnlyModelViewSet):
-    queryset =  History.objects.all()
+    queryset = History.objects.all()
     serializer_class = HistorySerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        return History.objects.filter(user=self.request.user).order_by('-id')
+
+    @action(detail=True, methods=['POST'])
+    def refund(self, request, *args, **kwargs):
+        history = self.get_object()
+        user = request.user
+        if history.user != user:
+            return Response(status=status.HTTP_403_FORBIDDEN)
+        elif history.is_refunded:
+            return Response(status=status.HTTP_422_UNPROCESSABLE_ENTITY)
+
+        for history_item in history.items.all():
+            try:
+                user_item = UserItem.objects.get(user=user, item=history_item.item)
+                user_item.count -= history_item.count
+                if user_item.count > 0:
+                    user_item.save()
+                else:
+                    user_item.delete()
+
+                user.point += history_item.item.price * history_item.count
+            except UserItem.DoesNotExist:
+                pass
+        history.is_refunded = True
+        history.save()
+        user.save()
+
+        serializer = self.get_serializer(history)
+        return Response(serializer.data)
