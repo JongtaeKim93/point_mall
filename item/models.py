@@ -6,8 +6,13 @@ class Category(models.Model):
     title = models.CharField(max_length=100)
 
 
+class Tag(models.Model):
+    tag = models.CharField(max_length=100)
+
+
 class Item(models.Model):
-    category = models.ForeignKey(Category, related_name='items', on_delete=models.CASCADE)
+    categories = models.ManyToManyField(Category, related_name='items')
+    tags = models.ManyToManyField(Tag, related_name='items')
     title = models.CharField(max_length=100)
     description = models.TextField()
     created = models.DateTimeField(auto_now_add=True)
